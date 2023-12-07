@@ -390,6 +390,8 @@ static const struct module_interface interface = {
 	.get_processing_mode = modules_get_processing_mode,
 	.set_configuration = modules_set_configuration,
 	.get_configuration = modules_get_configuration,
+	.bind = module_bind,
+	.unbind = module_unbind,
 	.reset = modules_reset,
 	.free = modules_free,
 };
