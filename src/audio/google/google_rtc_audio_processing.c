@@ -74,6 +74,7 @@ struct google_rtc_audio_processing_comp_data {
 	bool reconfigure;
 	int aec_reference_source;
 	int raw_microphone_source;
+	uint64_t perf;
 };
 
 void *GoogleRtcMalloc(size_t size)
@@ -662,6 +663,9 @@ static int google_rtc_audio_processing_process(struct processing_module *mod,
 
 	struct google_rtc_audio_processing_comp_data *cd = module_get_private_data(mod);
 
+	cd->perf = sof_cycle_get_64();
+
+
 	if (cd->reconfigure) {
 		ret = google_rtc_audio_processing_reconfigure(mod);
 		if (ret)
@@ -709,6 +713,8 @@ static int google_rtc_audio_processing_process(struct processing_module *mod,
 			cd->state,
 			(const int16_t *)cd->aec_reference_buffer);
 #endif
+	uint32_t diff1  = sof_cycle_get_64() - cd->perf;
+	
 	source_release_data(ref_stream, num_of_bytes_to_process);
 
 	/* process main stream - de interlace and convert */
@@ -757,6 +763,9 @@ static int google_rtc_audio_processing_process(struct processing_module *mod,
 	}
 
 	sink_commit_buffer(dst_stream, num_of_bytes_to_process);
+
+	uint32_t diff2= sof_cycle_get_64() - cd->perf;
+	comp_info(mod->dev, "AEC MODULE FINISH, cycles1 %u cycles2:", diff1, diff2 );
 
 	return 0;
 }
