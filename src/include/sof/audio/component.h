@@ -687,12 +687,38 @@ static inline struct comp_buffer *comp_dev_get_next_data_consumer(struct comp_de
 	     _producer = comp_dev_get_next_data_producer(_dev, _producer))
 
 /*
+ * a macro for easy iteration through component's list of producers
+ * allowing deletion of a buffer during iteration
+ *
+ * additional "safe storage" pointer to struct comp_buffer must be provided
+ */
+#define comp_dev_for_each_producer_safe(_dev, _producer, _next_producer)	\
+	for (_producer = comp_dev_get_first_data_producer(_dev),		\
+	     _next_producer = comp_dev_get_next_data_producer(_dev, _producer);	\
+	     _producer != NULL;							\
+	     _producer = _next_producer,					\
+	     _next_producer = comp_dev_get_next_data_producer(_dev, _producer))
+
+/*
  * a macro for easy iteration through component's list of consumers
  */
-#define comp_dev_for_each_consumer(_dev, _consumer)			\
-	for (_consumer = comp_dev_get_first_data_consumer(_dev);	\
-	     _consumer != NULL;						\
-	     _consumer = comp_dev_get_next_data_consumer(_dev, _consumer))
+#define comp_dev_for_each_consumer(_dev, _consumer)				\
+	for (_consumer = comp_dev_get_first_data_consumer(_dev);		\
+	     _consumer != NULL;							\
+	     _consumer = comp_dev_get_next_data_consumer(_dev, _consumer))	\
+
+/*
+ * a macro for easy iteration through component's list of consumers
+ * allowing deletion of a buffer during iteration
+ *
+ * additional "safe storage" pointer to struct comp_buffer must be provided
+ */
+#define comp_dev_for_each_consumer_safe(_dev, _consumer, _next_consumer)	\
+	for (_consumer = comp_dev_get_first_data_consumer(_dev),		\
+	     _next_consumer = comp_dev_get_next_data_consumer(_dev, _consumer);	\
+	     _consumer != NULL;							\
+	     _consumer = _next_consumer,					\
+	     _next_consumer = comp_dev_get_next_data_consumer(_dev, _consumer))
 
 /** @}*/
 
